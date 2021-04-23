@@ -122,7 +122,7 @@ To watch as new content is added, you can continuously "tail" the file:
 ```bash
 tail -f /tmp/doing-stuff.txt
 
-# Type "q" and return to exit
+# Hit "CTRL c" to exit
 ```
 
 We can get feedback from our script by piping any logging and errors to a separate file. 
@@ -133,7 +133,7 @@ Let's update our cronjob as below:
 * * * * * /bin/sh /Users/tumgoren/code/unix-workbench/do_stuff.sh > /tmp/doing-stuff.log 2>&1
 ```
 
-Let's break our script by changing `date` to `dat` in `do_stuff.sh`. This should produce an error that gets sent to our `/tmp/doing-stuff.log`.
+Now let's break our script by changing `date` to `dat` in `do_stuff.sh`. This should produce an error that gets sent to our `/tmp/doing-stuff.log`.
 
 After saving the file, wait a minute and then check the content of `/tmp/doing-stuff.log`
 
@@ -159,19 +159,27 @@ Hit `crontab -e` and update as below:
 
 Let's work through a more real-world example of creating a shell script and automating it. 
 
-We'll use the [`failed_banks_ca.sh`](fdic/failed_banks.sh) script, which does the following:
+We'll use the [`failed_banks_ca.sh`](fdic/failed_banks_ca.sh) script, which does the following:
 
 - Downloads the FDIC Failed Banks list 
 - Ceates a new CSV containing only CA banks
 - Prints out the number of failed banks
 
-Try running the script locally:
+[Download the script](https://raw.githubusercontent.com/stanfordjournalism/unix-workbench/main/fdic/failed_banks_ca.sh) and try running it:
 
 ```bash
-sh
+sh failed_banks_ca.sh
 ```
 
-If all looks well, we'll add the following to crontab:
+If the script ran correctly, you should see two new files: `banklist.csv` and `failed_banks_ca.csv`. 
+
+Delete these files:
+
+```bash
+rm banklist.csv failed_banks_ca.csv
+```
+
+Now, we'll try automating the script by adding the following to crontab:
 
 ```bash
 # Changing the working directory simplifies things for this example
@@ -183,7 +191,7 @@ FDIC_DIR=/Users/tumgoren/code/unix-workbench/fdic
 * * * * * cd $FDIC_DIR && /bin/sh failed_banks_ca.sh >> /tmp/failed_banks.log 2>&1
 ```
 
-If all goes well, you should see `banklist.csv` and `failed_banks_ca.csv` in the directory containing the script. And `/tmp/failed_banks.log` should display a message showing the count of failed banks in CA.
+You should see `banklist.csv` and `failed_banks_ca.csv` in the directory containing the script. And `/tmp/failed_banks.log` should display a message showing the count of failed banks in CA.
 
 
 ## More Power Tools
