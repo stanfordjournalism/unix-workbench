@@ -268,7 +268,7 @@ states ca
 
 ### Farmshare
 
-Stanford offers free VMs in their [Farmshare](https://web.stanford.edu/group/farmshare/cgi-bin/wiki/index.php/Main_Page) cloud for you experiment with.
+Stanford offers free VMs in their [Farmshare](https://web.stanford.edu/group/farmshare/cgi-bin/wiki/index.php/Main_Page) cloud for you to experiment with.
 
 You can use `ssh` to connect via "secure shell" to a machine.
 
@@ -277,9 +277,9 @@ You can use `ssh` to connect via "secure shell" to a machine.
 ssh tumgoren@rice.stanford.edu
 ```
 
-Once there all the normal bash commands mentioned above should work.
+These Ubuntu Linux VMs offer all the standard bash commands mentioned above.
 
-Beware that you're not guaranteed to end up on the same machine, so installing software can get tricky. You can target a specific with a bit of a two-step:
+Beware that you're not guaranteed to end up on the same machine, so installing software can get tricky. You can target a specific VM with a bit of a two-step:
 
 ```bash
 # Get the specific machine name
@@ -295,9 +295,18 @@ rice03
 exit
 ```
 
+These machines are free, but long term, you'll likely want to learn how to set up your own virtual machine in the cloud. 
+
+Both Amazon Web Services and Google Cloud Platform offer free beginner tiers for spinning up virtual machines:
+
+* [AWS EC2](https://aws.amazon.com/ec2/)
+* [GCP Compute Engine](https://cloud.google.com/compute/)
+
 ### Data wrangling
 
-csvkit is a collection of Python utilities that allows you to more easily wrangle data.
+[csvkit](https://csvkit.readthedocs.io/en/latest/) is a collection of Python utilities that allows you to more easily wrangle data.
+
+Here's an [example script](csvkit_wrangle_budgets.sh) that merges yearly budget files into a single CSV. 
 
 > NOTE: The tool is written in Python and the install can be flaky at times. It's worth the headaches, so reach out if you have trouble installing.
 
