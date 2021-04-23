@@ -304,11 +304,11 @@ Both Amazon Web Services and Google Cloud Platform offer free beginner tiers for
 
 ### Data wrangling
 
-[csvkit](https://csvkit.readthedocs.io/en/latest/) is a collection of Python utilities that allows you to more easily wrangle data.
+[csvkit](https://csvkit.readthedocs.io/en/latest/) is a collection of command-line utilities that allows you to more easily wrangle data.
 
-Here's an [example script](csvkit_wrangle_budgets.sh) that merges yearly budget files into a single CSV. 
+Here's an [example script](csvkit_wrangle_budgets.sh) that merges yearly budget files into a single CSV and adds population data.
 
-> NOTE: The tool is written in Python and the install can be flaky at times. It's worth the headaches, so reach out if you have trouble installing.
+> NOTE: The tool is written in Python and the install can be flaky at times. It's worth the headaches so reach out if you have trouble installing.
 
 
 ## Reference
