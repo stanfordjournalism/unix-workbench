@@ -24,6 +24,22 @@ Bash pipes allow you to feed the output from one command as the input to another
 grep CA state_data.txt | wc -l
 ```
 
+### Homebrew for installs
+
+Note, various commands below may require installation using [Homebrew](https://brew.sh/) on Macs.
+
+Check if you have Homebrew already:
+
+```bash
+brew -v
+```
+
+If not, install it with:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
 ## Getting data
 
  Downloading files with [curl][].
@@ -53,14 +69,122 @@ curl -O $URL/index.html
 
 ## Shell scripts
 
-- Download FDIC failed banks list
-- Filter for CA records
-- Poduce a new file containing only the CA records
+You can wrap up your commands into a shell script.
 
+Drop the following commands into a shell script called `do_stuff.sh`
+
+```
+#!/bin/bash
+
+date >> /tmp/doing-stuff.txt
+```
+
+Run the script by typing:
+
+```bash
+sh do_stuff.sh
+```
 
 ## Automation
 
-Automate a shell script with a cronjob
+You can automate shell scripts or even individual Unix commands by using [cronjobs][], a tool built into Unix machines for scheduling tasks.
+
+Let's automate our `do_stuff.sh` shell script from above.
+
+To create a cronjob, you must edit your user's `crontab` file using `crontab -e`.
+
+This will drop you into the crontab file using the default shell editor. Once you make changes and save, the cronjob will be active.
+
+_It's important to note that cron is a very limited environment._ It can only "see" programs or files in a limited number of directories, so it's a good idea to provide full paths to built-in shell utilities, custom scripts and input/output files and directories.
+
+> You may also need to configure the [PATH](https://en.wikipedia.org/wiki/PATH_(variable)) environment variable in a cron context. See [cronjobs][] for more background and details.
+
+To set up your cronjob, first determine the location of your script:
+
+```bash
+pwd
+```
+
+Then, in crontab, paste the full path to your script and set it to run every minute. _You'll need to modify the path to `do_stuff.sh` to match the location on your machine!_
+
+```bash
+* * * * * /bin/sh /Users/tumgoren/code/unix-workbench/do_stuff.sh
+```
+
+After the script runs the first time, you should see the content:
+
+```bash
+cat /tmp/doing-stuff.txt
+```
+
+To watch as new content is added, you can continuously "tail" the file:
+
+```bash
+tail -f /tmp/doing-stuff.txt
+
+# Type "q" and return to exit
+```
+
+We can get feedback from our script by piping any logging and errors to a separate file. 
+
+Let's update our cronjob as below:
+
+```bash
+* * * * * /bin/sh /Users/tumgoren/code/unix-workbench/do_stuff.sh > /tmp/doing-stuff.log 2>&1
+```
+
+Let's break our script by changing `date` to `dat` in `do_stuff.sh`. This should produce an error that gets sent to our `/tmp/doing-stuff.log`.
+
+After saving the file, wait a minute and then check the content of `/tmp/doing-stuff.log`
+
+```bash
+cat /tmp/doing-stuff.log
+```
+
+You can "tail" this file continuously once it's created, which can be quite handy when debugging a script:
+
+```bash
+tail -f /tmp/doing-stuff.log
+```
+
+Lastly, you can disable cronjobs by "commenting them out" with a hash (`#`), as below. Or you can of course delete them. 
+
+Hit `crontab -e` and update as below:
+
+```bash
+#* * * * * /bin/sh /Users/tumgoren/code/unix-workbench/do_stuff.sh > /tmp/doing-stuff.log 2>&1
+```
+
+## Getting real
+
+Let's work through a more real-world example of creating a shell script and automating it. 
+
+We'll use the [`failed_banks_ca.sh`](fdic/failed_banks.sh) script, which does the following:
+
+- Downloads the FDIC Failed Banks list 
+- Ceates a new CSV containing only CA banks
+- Prints out the number of failed banks
+
+Try running the script locally:
+
+```bash
+sh
+```
+
+If all looks well, we'll add the following to crontab:
+
+```bash
+# Changing the working directory simplifies things for this example
+# NOTE: 
+#  - double-arrow redirection appends to log file 
+#  - We use FDIC_DIR to make the command more readable
+
+FDIC_DIR=/Users/tumgoren/code/unix-workbench/fdic
+* * * * * cd $FDIC_DIR && /bin/sh failed_banks_ca.sh >> /tmp/failed_banks.log 2>&1
+```
+
+If all goes well, you should see `banklist.csv` and `failed_banks_ca.csv` in the directory containing the script. And `/tmp/failed_banks.log` should display a message showing the count of failed banks in CA.
+
 
 ## More Power Tools
 
@@ -70,18 +194,18 @@ Here's a smattering of tools and examples that might be useful.
 
 ### tree
 
-`tree` lists all directories and files and is quite handy when futzing about on the command line.
+The [tree](https://en.wikipedia.org/wiki/Tree_(command)) lists all directories and files and is quite handy when futzing about on the command line.
 
+> Mac users should `brew intstall tree`
 
 ```bash
-brew intstall tree
 cd /some/directory
 tree 
 ```
 
 ### Mirror a website
 
-wget is another tool that helps download files. In some ways it resembles `curl`, but it also has some key differentiating features such as the ability to mirror an entire website.
+[wget](https://www.tutorialspoint.com/unix_commands/wget.htm) is another tool that helps download files. In some ways it resembles `curl`, but it also has some key differentiating features such as the ability to mirror an entire website.
 
 ```
 wget --mirror https://data-driven.news/bna/2021
@@ -94,22 +218,25 @@ Go to http://localhost:8000 and view the site.
 
 ### Socrata to SQL
 
-[socrata2sql](https://github.com/stanfordjournalism/stanford-progj-2021/blob/main/docs/power_tools_for_data_wrangling.md#even-more-power-tools) allows you to easily import data sets from Socrata-backed government data sites into a SQLite database.
+[socrata2sql](https://sqlitebrowser.org/) allows you to easily import data sets from Socrata-backed government data sites into a SQLite database.
 
-Here's a one-liner that pulls in SF evictions from the [San Francisco open data portal](https://datasf.org/opendata/).
+> NOTE: `socrata2sql` only works on Python 3.x
 
+To install:
 
- 
 ```bash
 pip install socrata2sql
+```
+
+Here's a one-liner that pulls in SF evictions from the [San Francisco open data portal](https://datasf.org/opendata/).
+ 
+```bash
 socrata2sql insert data.sfgov.org 5cei-gny5 
 ```
 
-> Note, YMMV with Python 2.x. Try `pip3 install socrata2sql` if the above doesn't work.
-
 Depending on the site and the size of the data, you may need to register for an API key in order to pull the data down.
 
-Also
+You can view and query SQLite databases using tools such as [DB Browser](https://sqlitebrowser.org/).
 
 ### State metadata
 
@@ -165,5 +292,6 @@ csvkit is a collection of Python utilities that allows you to more easily wrangl
 
 [Bash overview]: https://docs.google.com/presentation/d/1jsiTriZTTZxtGse9xia_e36MzJSseX-EUdzEZHrVmaA/edit?usp=sharing
 [Bash drill]: https://github.com/stanfordjournalism/stanford-progj-2021/blob/main/exercises/bash_drill.md
+[cronjobs]: cronjobs.md
 [curl]: https://linuxhandbook.com/curl-command-examples/
 [us]: https://github.com/unitedstates/python-us#cli
