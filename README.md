@@ -226,7 +226,7 @@ Go to http://localhost:8000 and view the site.
 
 ### Socrata to SQL
 
-[socrata2sql](https://sqlitebrowser.org/) allows you to easily import data sets from Socrata-backed government data sites into a SQLite database.
+[socrata2sql](https://sqlitebrowser.org/) allows you to easily import data sets from Socrata-backed government data sites into databases such as SQLite.
 
 > NOTE: `socrata2sql` only works on Python 3.x
 
@@ -236,7 +236,16 @@ To install:
 pip install socrata2sql
 ```
 
-Here's a one-liner that pulls in SF evictions from the [San Francisco open data portal](https://datasf.org/opendata/).
+List the data sets available on [San Francisco open data portal](https://datasf.org/opendata/).
+
+```bash
+socrata2sql ls data.sfgov.org
+
+# Or redirect the list to a file
+socrata2sql ls data.sfgov.org > sfdatasets.txt
+```
+
+Create a SQLite database of [SF eviction notices](https://data.sfgov.org/Housing-and-Buildings/Eviction-Notices/5cei-gny5).
  
 ```bash
 socrata2sql insert data.sfgov.org 5cei-gny5 
